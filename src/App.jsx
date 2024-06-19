@@ -6,18 +6,22 @@ import Notes from "./pages/Notes";
 import Note from "./pages/Note";
 import Profile from "./pages/Profile";
 
+import { NotesProvider } from "./context/NotesContext";
+
 const App = () => {
   return (
-    <BrowserRouter>
-      <NavBar>
-        <Routes>
-          <Route path={"/"} element={<Home />} />
-          <Route path={"/profile"} element={<Profile />} />
-          <Route path={"/notes"} element={<Notes />} />
-          <Route path={"/note/:title"} element={<Note />} />
-        </Routes>
-      </NavBar>
-    </BrowserRouter>
+    <NotesProvider>
+      <BrowserRouter>
+        <NavBar>
+          <Routes>
+            <Route path={"/"} element={<Home />} />
+            <Route path={"/profile"} element={<Profile />} />
+            <Route path={"/notes"} element={<Notes />} />
+            <Route path={"/note/:title"} element={<Note />} />
+          </Routes>
+        </NavBar>
+      </BrowserRouter>
+    </NotesProvider>
   );
 };
 

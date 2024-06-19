@@ -1,23 +1,29 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaBars } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import { newNoteRequest } from "../api/notes";
 import { useNavigate } from "react-router-dom";
+import { useNotes } from "../context/NotesContext";
+
+import OpenNote from "../components/OpenNote";
 
 const Aside = ({ isToggled, isMouseOver, handleMouseOver }) => {
   const navigate = useNavigate();
+
+  const { newNote } = useNotes();
+
   const handleNewNote = async (e) => {
     e.preventDefault();
-    let data = "";
-    data = e.target.children[0].value;
-    try {
-      await newNoteRequest(data);
-      e.target.children[1].value = "";
-      navigate(`/note/${data}`);
-    } catch (error) {
-      console.log(error);
-    }
+    const title = e.target.childNodes[0].value.trim();
+    (async () => {
+      try {
+        await newNote(title).then(()=>navigate("/note/"+title.trim().replaceAll(" ", "_")));
+      } catch (error) {
+        console.log(error);
+      } finally {
+      }
+    })();
+    e.target.childNodes[0].value = "";
   };
   const preventInputEnter = (e) => {
     if (
@@ -79,7 +85,6 @@ const Aside = ({ isToggled, isMouseOver, handleMouseOver }) => {
             onSubmit={handleNewNote}
             className="flex justify-center flex-wrap items-center align-middle"
           >
-            {" "}
             <input
               placeholder={"Titulo"}
               required
@@ -103,8 +108,7 @@ const Aside = ({ isToggled, isMouseOver, handleMouseOver }) => {
 const Nav = ({ children }) => {
   const [isToggled, setIsToggled] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
-
-  useCallback;
+  const { openNotes } = useNotes();
 
   const handleToggled = () => {
     isToggled ? setIsToggled(false) : setIsToggled(true);
@@ -123,8 +127,8 @@ const Nav = ({ children }) => {
       <div className="relative inline-block h-full grow">
         <div className="flex flex-col h-full">
           {/* Nav */}
-          <nav className="h-12">
-            <div className="flex">
+          <nav className="">
+            <div className="flex h-12">
               <button
                 onClick={handleToggled}
                 className="text-white rounded-md text-3xl p-3"
@@ -132,6 +136,11 @@ const Nav = ({ children }) => {
                 <FaBars />
               </button>
             </div>
+            <ul className="flex flex-nowrap justify-end gapx-2">
+              {openNotes.map((note, i) => {
+                return <OpenNote note={note} to={"/note/" + note} key={i} />;
+              })}
+            </ul>
           </nav>
 
           {/* Main */}
